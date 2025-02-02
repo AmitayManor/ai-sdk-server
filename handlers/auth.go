@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"api/models"
+	"github.com/gofiber/fiber/v2"
 	"github.com/supabase-community/supabase-go"
 )
 
@@ -23,7 +23,7 @@ func (h *AuthHandler) SignUp(c *fiber.Ctx) error {
 
 	if err := c.BodyParser(&input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": models.ErrInvalidRequestStatus.Error,
+			"error": "invalid body request",
 		})
 	}
 
