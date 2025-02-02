@@ -53,7 +53,7 @@ func (h *RequestHandler) CreateModelRequest(c *fiber.Ctx) error {
 
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": models.ErrModelNotFound.Error,
+			"error": "request not initialized in database",
 		})
 	}
 
