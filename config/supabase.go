@@ -16,7 +16,7 @@ func InitSupabase() error {
 
 	// The URL should include the full path
 	supabaseURL := os.Getenv("SUPABASE_URL")
-	supabaseKey := os.Getenv("SUPABASE_ANON_KEY")
+	supabaseKey := os.Getenv("SUPABASE_SERVICE_ROLE_KEY")
 
 	fmt.Printf("Supabase URL: %s\n", supabaseURL)
 	fmt.Printf("Supabase Key length: %d\n", len(supabaseKey))
@@ -39,7 +39,7 @@ var dbClient *postgrest.Client
 
 func InitPostgres() error {
 	supabaseUrl := os.Getenv("SUPABASE_URL")
-	supabaseKey := os.Getenv("SUPABASE_ANON_KEY")
+	supabaseKey := os.Getenv("SUPABASE_SERVICE_ROLE_KEY")
 
 	headers := map[string]string{
 		"apikey":        supabaseKey,
