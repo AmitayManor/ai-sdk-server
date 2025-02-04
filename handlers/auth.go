@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/supabase-community/gotrue-go/types"
 	"github.com/supabase-community/supabase-go"
 )
 
@@ -16,10 +17,7 @@ func NewAuthHandler(supabaseClient *supabase.Client) *AuthHandler {
 }
 func (h *AuthHandler) SignUp(c *fiber.Ctx) error {
 
-	var input struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
+	var input types.SignupRequest
 
 	if err := c.BodyParser(&input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -27,7 +25,7 @@ func (h *AuthHandler) SignUp(c *fiber.Ctx) error {
 		})
 	}
 
-	_, err := h.supabaseClient.Auth.SignInWithEmailPassword(input.Email, input.Password)
+	_, err := h.supabaseClient.Auth.Signup(input)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "signup failed",
