@@ -7,7 +7,7 @@ export class RequestProcessor {
     private hfClient: HuggingFaceClient;
 
     constructor(supabaseUrl: string, supabaseKey: string, hfApiKey: string) {
-        const serviceRoleKey = Deno.env.get("_SUPABASE_SERVICE_ROLE_KEY");
+        const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
         const keyToUse = serviceRoleKey ? serviceRoleKey : supabaseKey;
         console.log("Using key for supabase client:", serviceRoleKey ? "service_role" : "anon");
         this.supabase = createClient(supabaseUrl, keyToUse);
