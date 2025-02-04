@@ -52,7 +52,8 @@ func (h *AuthHandler) SignIn(c *fiber.Ctx) error {
 	authResponse, err := h.supabaseClient.Auth.SignInWithEmailPassword(input.Email, input.Password)
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Invalid credentials",
+			"error":   "Invalid credentials",
+			"details": err.Error(),
 		})
 	}
 
