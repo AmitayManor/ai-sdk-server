@@ -2,9 +2,9 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { RequestProcessor } from './shared/processor.ts';
 import { ModelRequest } from './shared/types.ts';
 
-const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
-const hfApiKey = Deno.env.get('HF_API_TOKEN')!;
+const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')|| '';
+const hfApiKey = Deno.env.get('HF_API_TOKEN')|| '';
 
 const processor = new RequestProcessor(supabaseUrl, supabaseKey, hfApiKey);
 
