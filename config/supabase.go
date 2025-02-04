@@ -5,7 +5,6 @@ import (
 	"github.com/supabase-community/postgrest-go"
 	"github.com/supabase-community/supabase-go"
 	"os"
-	"strings"
 )
 
 var SupabaseClient *supabase.Client
@@ -17,10 +16,6 @@ func InitSupabase() error {
 
 	// The URL should include the full path
 	supabaseURL := os.Getenv("SUPABASE_URL")
-	if !strings.HasPrefix(supabaseURL, "https://") {
-		supabaseURL = "https://" + supabaseURL
-	}
-
 	supabaseKey := os.Getenv("SUPABASE_ANON_KEY")
 
 	fmt.Printf("Supabase URL: %s\n", supabaseURL)
