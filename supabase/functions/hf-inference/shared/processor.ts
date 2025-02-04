@@ -1,13 +1,16 @@
-import { createClient } from 'jsr:@supabase/supabase-js';
-import { HuggingFaceClient } from './huggingface.ts';
-import { ModelRequest, ProcessingResult } from './types.ts';
+import { createClient } from "jsr:@supabase/supabase-js";
+import { HuggingFaceClient } from "./huggingface.ts";
+import { ModelRequest, ProcessingResult } from "./types.ts";
 
 export class RequestProcessor {
     private supabase: any;
     private hfClient: HuggingFaceClient;
 
     constructor(supabaseUrl: string, supabaseKey: string, hfApiKey: string) {
-        this.supabase = createClient(supabaseUrl, supabaseKey);
+        const serviceRoleKey = Deno.env.get("_SUPABASE_SERVICE_ROLE_KEY");
+        const keyToUse = serviceRoleKey ? serviceRoleKey : supabaseKey;
+        console.log("Using key for supabase client:", serviceRoleKey ? "service_role" : "anon");
+        this.supabase = createClient(supabaseUrl, keyToUse);
         this.hfClient = new HuggingFaceClient(hfApiKey);
     }
 
@@ -24,60 +27,32 @@ export class RequestProcessor {
             ...(data?.processingTime && { processing_time: data.processingTime }),
             ...(data?.tokenCount && { token_count: data.tokenCount })
         };
-
         await this.supabase
-            .from('model_requests')
+            .from("model_requests")
             .update(updates)
             .match({ id: requestId });
     }
 
-    private async storeImage(userId: string, requestId: string, imageData: Uint8Array) {
-        const filePath = `${userId}/${requestId}.png`;
-
-        await this.supabase.storage
-            .from('generated-images')
-            .upload(filePath, imageData, {
-                contentType: 'image/png',
-                upsert: true
-            });
-
-        return filePath;
-    }
-
     async processRequest(request: ModelRequest): Promise<ProcessingResult> {
         try {
-            // Update status to processing
-            await this.updateRequestStatus(request.id, 'processing');
-
-            // Process based on model type
-            const result = request.modelType === 'text2text'
-                ? await this.hfClient.processText(request.input)
-                : await this.hfClient.processImage(request.input);
-
-            if (result.status === 'error') {
-                await this.updateRequestStatus(request.id, 'failed', null, result.error);
+            await this.updateRequestStatus(request.id, "processing");
+            const result = await this.hfClient.processText(request.input);
+            if (result.status === "error") {
+                await this.updateRequestStatus(request.id, "failed", null, result.error);
                 return result;
             }
-
-            // For image responses, store the image and update the output with the file path
-            if (request.modelType === 'text2image' && result.data) {
-                const imagePath = await this.storeImage(
-                    request.userId,
-                    request.id,
-                    result.data.output as Uint8Array
-                );
-                result.data.output = imagePath;
-            }
-
-            // Update request with results
-            await this.updateRequestStatus(request.id, 'completed', result.data);
-
+            await this.updateRequestStatus(request.id, "completed", result.data);
             return result;
         } catch (error) {
-            await this.updateRequestStatus(request.id, 'failed', null, error as string);
+            await this.updateRequestStatus(
+                request.id,
+                "failed",
+                null,
+                error instanceof Error ? error.message : String(error)
+            );
             return {
-                status: 'error',
-                error: error as string
+                status: "error",
+                error: error instanceof Error ? error.message : String(error)
             };
         }
     }
