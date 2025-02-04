@@ -50,7 +50,6 @@ func main() {
 	}))
 
 	authHandler := handlers.NewAuthHandler(config.GetSupabaseClient())
-	storageHandler := handlers.NewStorageHandler(config.GetStorageClient())
 	requestHandler := handlers.NewRequestHandler()
 
 	//SignUp route
@@ -67,9 +66,6 @@ func main() {
 	// Model requests endpoints
 	api.Post("/requests", requestHandler.CreateModelRequest)
 	api.Get("/requests", requestHandler.ListRequests)
-
-	// Storage endpoints
-	api.Get("/images/:id", storageHandler.GetGeneratedImage)
 
 	port := os.Getenv("PORT")
 	if port == "" {
